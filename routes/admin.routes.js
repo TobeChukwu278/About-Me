@@ -55,9 +55,12 @@ async function adminRoutes(fastify, options) {
       const admin = await Admin.findOne({ username, isActive: true });
 
       if (!admin || !(await admin.comparePassword(password))) {
+        // ensure CSRF token present for the re-rendered login form
+        ensureCsrf(request);
         return reply.view('admin/login', {
           error: 'Invalid credentials',
-          pageTitle: 'Admin Login'
+          pageTitle: 'Admin Login',
+          csrfToken: request.session.csrfToken
         });
       }
 
@@ -73,9 +76,11 @@ async function adminRoutes(fastify, options) {
       return reply.redirect('/admin/dashboard?login=1');
     } catch (error) {
       fastify.log.error('Login error:', error);
+      ensureCsrf(request);
       return reply.view('admin/login', {
         error: 'An error occurred. Please try again.',
-        pageTitle: 'Admin Login'
+        pageTitle: 'Admin Login',
+        csrfToken: request.session.csrfToken
       });
     }
   });
