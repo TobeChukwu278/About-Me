@@ -225,30 +225,68 @@ Edit the chat logic in `routes/api.js` at the `/api/chat` endpoint.
 
 ## 🚀 Deployment
 
-### Render
+### Render (Recommended - Free & Easy)
+
+For a quick deployment guide, see **[DEPLOY_QUICK_START.md](./DEPLOY_QUICK_START.md)**
+
+For detailed deployment documentation, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**
+
+**Quick Steps:**
+1. Push to GitHub (already done)
+2. Go to https://render.com and sign in with GitHub
+3. Create new Web Service from your GitHub repo
+4. Add environment variables (MONGO_URI, SESSION_SECRET, NODE_ENV)
+5. Deploy!
+
+Your app will be live at `https://your-app-name.onrender.com`
+
+### Local Deployment (VPS/DigitalOcean)
 
 ```bash
+# SSH into your server
+ssh user@your-server-ip
 
-```
+# Install Node.js (v18+)
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
-### Pxxl
-
-```bash
-
-```
-
-### DigitalOcean/VPS
-
-```bash
-# Install Node.js and MongoDB
 # Clone repository
+git clone https://github.com/TobeChukwu278/About-Me.git
+cd About-Me
+
 # Install dependencies
-# Set up .env file
-# Use PM2 for process management
-pm2 start server.js --name portfolio
-pm2 save
+npm install
+
+# Create .env file
+nano .env
+# Add: MONGO_URI, SESSION_SECRET, NODE_ENV=production, PORT=3000
+
+# Install PM2 (process manager)
+npm install -g pm2
+
+# Start application
+pm2 start index.js --name portfolio
+
+# Enable auto-restart on reboot
 pm2 startup
+pm2 save
 ```
+
+### Environment Variables Required
+
+```env
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/?appName=Cluster0
+SESSION_SECRET=your-strong-secret-key
+NODE_ENV=production
+PORT=3000
+```
+
+**⚠️ Security Notes:**
+- Never commit `.env` file (it's in `.gitignore`)
+- Use `.env.example` as template
+- Generate strong SESSION_SECRET (50+ characters)
+- Change default admin credentials after deployment
+- Enable HTTPS (automatic with Render, use nginx/certbot for VPS)
 
 ### Docker
 
