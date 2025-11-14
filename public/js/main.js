@@ -1,26 +1,29 @@
 // Internet Connectivity Monitor
-let isOnline = navigator.onLine;
+let wasOnline = navigator.onLine;
 const statusIndicator = document.getElementById('statusIndicator');
 const statusText = document.getElementById('statusText');
 
 function updateOnlineStatus() {
-  if (navigator.onLine) {
-    isOnline = true;
+  const isCurrentlyOnline = navigator.onLine;
+
+  if (isCurrentlyOnline) {
     statusIndicator.classList.remove('offline');
     statusText.textContent = 'SYSTEM ONLINE';
     statusText.classList.remove('text-red-400');
     statusText.classList.add('text-emerald-400');
-    
-    // Reload page if coming back online
-    if (!isOnline) {
+
+    // Reload page if coming back online from offline state
+    if (!wasOnline) {
+      wasOnline = true;
       location.reload();
     }
+    wasOnline = true;
   } else {
-    isOnline = false;
     statusIndicator.classList.add('offline');
     statusText.textContent = 'OFFLINE';
     statusText.classList.remove('text-emerald-400');
     statusText.classList.add('text-red-400');
+    wasOnline = false;
   }
 }
 
@@ -31,16 +34,15 @@ window.addEventListener('offline', updateOnlineStatus);
 // Initial status check
 updateOnlineStatus();
 
+
 // Live Stats Updates
 async function fetchStats() {
-  if (!isOnline) return;
-  
-  try {
+  if (!navigator.onLine) return; try {
     const response = await fetch('/api/stats');
     if (!response.ok) throw new Error('Failed to fetch stats');
-    
+
     const data = await response.json();
-    
+
     document.getElementById('uptime').textContent = data.uptime;
     document.getElementById('latency').textContent = data.latency + 'ms';
     document.getElementById('requests').textContent = data.requests;
@@ -72,14 +74,14 @@ chatClose.addEventListener('click', () => {
 async function sendMessage() {
   const message = chatInput.value.trim();
   if (!message) return;
-  
+
   // Add user message to chat
   addMessageToChat('user', message);
   chatInput.value = '';
-  
+
   // Show typing indicator
   const typingIndicator = addTypingIndicator();
-  
+
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
@@ -88,12 +90,12 @@ async function sendMessage() {
       },
       body: JSON.stringify({ message })
     });
-    
+
     const data = await response.json();
-    
+
     // Remove typing indicator
     typingIndicator.remove();
-    
+
     // Add AI response
     addMessageToChat('ai', data.response);
   } catch (error) {
@@ -106,15 +108,14 @@ async function sendMessage() {
 function addMessageToChat(type, text) {
   const messageDiv = document.createElement('div');
   messageDiv.className = `flex ${type === 'user' ? 'justify-end' : 'justify-start'}`;
-  
+
   const bubble = document.createElement('div');
-  bubble.className = `max-w-[80%] px-3 py-2 rounded-lg text-sm ${
-    type === 'user' 
-      ? 'bg-cyan-500/20 border border-cyan-500/30 text-cyan-100' 
+  bubble.className = `max-w-[80%] px-3 py-2 rounded-lg text-sm ${type === 'user'
+      ? 'bg-cyan-500/20 border border-cyan-500/30 text-cyan-100'
       : 'bg-gray-800 border border-gray-700 text-gray-300'
-  }`;
+    }`;
   bubble.textContent = text;
-  
+
   messageDiv.appendChild(bubble);
   chatMessages.appendChild(messageDiv);
   chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -144,7 +145,7 @@ chatInput.addEventListener('keypress', (e) => {
 });
 
 // Track page view
-if (isOnline) {
+if (navigator.onLine) {
   fetch('/api/track', {
     method: 'POST',
     headers: {
@@ -165,7 +166,7 @@ function attemptReconnect() {
   if (!navigator.onLine && retryAttempts < maxRetries) {
     retryAttempts++;
     console.log(`Attempting to reconnect... (${retryAttempts}/${maxRetries})`);
-    
+
     fetch('/health')
       .then(() => {
         console.log('Connection restored!');

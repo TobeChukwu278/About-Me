@@ -3,13 +3,13 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const Admin = require('../models/Admin');
-const { 
-  Hero, 
-  TechStack, 
-  Project, 
-  Experience, 
-  About, 
-  Contact 
+const {
+  Hero,
+  TechStack,
+  Project,
+  Experience,
+  About,
+  Contact
 } = require('../models/Portfolio');
 
 async function seedDatabase() {
@@ -25,7 +25,7 @@ async function seedDatabase() {
     await Experience.deleteMany({});
     await About.deleteMany({});
     await Contact.deleteMany({});
-    
+
     console.log('Cleared existing data');
 
     // Create admin user
@@ -92,7 +92,11 @@ async function seedDatabase() {
       {
         name: 'FastAPI Gateway',
         description: 'High-performance API gateway handling 10K req/s with intelligent routing and rate limiting',
+        longDescription: 'A production-ready API gateway built with Fastify that demonstrates advanced routing patterns, middleware composition, and performance optimization. Features include request rate limiting, automatic request throttling, and real-time metrics collection. The gateway seamlessly routes requests to multiple backend services while maintaining sub-millisecond latency.',
         tags: ['Fastify', 'Redis', 'Docker'],
+        githubUrl: 'https://github.com',
+        liveUrl: 'https://api-gateway-demo.example.com',
+        liveDemo: 'https://stackblitz.com/github/fastify/fastify/tree/master/examples',
         order: 1,
         featured: true,
         isActive: true
@@ -100,7 +104,11 @@ async function seedDatabase() {
       {
         name: 'MongoDB Analytics Pipeline',
         description: 'Real-time data aggregation system processing millions of documents',
+        longDescription: 'A sophisticated data processing system that aggregates and transforms large datasets in real-time. Built with MongoDB aggregation pipelines and Node.js, this system processes millions of documents daily while maintaining sub-second response times. Includes advanced filtering, sorting, and caching mechanisms for optimal performance.',
         tags: ['MongoDB', 'Node.js', 'Redis'],
+        githubUrl: 'https://github.com',
+        liveUrl: 'https://analytics-pipeline.example.com',
+        liveDemo: 'https://stackblitz.com/github/mongodb-developer/nodejs-async-await',
         order: 2,
         featured: true,
         isActive: true
@@ -108,7 +116,11 @@ async function seedDatabase() {
       {
         name: 'Microservices Orchestrator',
         description: 'Container orchestration platform for managing distributed services',
+        longDescription: 'An advanced microservices management platform that simplifies deployment, scaling, and monitoring of containerized applications. Built with Docker and Kubernetes principles, this orchestrator provides an intuitive interface for managing complex service topologies, health checks, and automated scaling policies.',
         tags: ['Docker', 'Kubernetes', 'Node.js'],
+        githubUrl: 'https://github.com',
+        liveUrl: 'https://orchestrator-demo.example.com',
+        liveDemo: 'https://stackblitz.com/github/docker/awesome-compose',
         order: 3,
         featured: true,
         isActive: true
@@ -166,7 +178,7 @@ async function seedDatabase() {
     console.log('You can now login with:');
     console.log('Username: admin');
     console.log('Password: admin123');
-    
+
     process.exit(0);
   } catch (error) {
     console.error('Error seeding database:', error);

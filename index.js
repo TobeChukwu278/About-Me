@@ -21,6 +21,8 @@ fastify.register(require('@fastify/static'), {
   prefix: '/public/'
 });
 
+// Parse application/x-www-form-urlencoded bodies (HTML forms)
+fastify.register(require('@fastify/formbody'));
 fastify.register(require('@fastify/cookie'));
 fastify.register(require('@fastify/session'), {
   secret: process.env.SESSION_SECRET || 'your-super-secret-key-change-in-production',
@@ -64,9 +66,9 @@ fastify.decorate('getRequestCount', () => requestCounter);
 const start = async () => {
   try {
     await connectDB();
-    await fastify.listen({ 
-      port: process.env.PORT || 3000, 
-      host: '0.0.0.0' 
+    await fastify.listen({
+      port: process.env.PORT || 3000,
+      host: '0.0.0.0'
     });
     fastify.log.info(`Server running on port ${process.env.PORT || 3000}`);
   } catch (err) {

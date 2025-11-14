@@ -22,9 +22,12 @@ const techStackSchema = new mongoose.Schema({
 const projectSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
+  longDescription: { type: String }, // Detailed description for project detail page
   tags: [{ type: String }],
   link: { type: String },
   githubUrl: { type: String },
+  liveUrl: { type: String }, // Live project URL
+  liveDemo: { type: String }, // Embeddable demo URL (iframe src)
   order: { type: Number, default: 0 },
   featured: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true }
@@ -57,10 +60,10 @@ const contactSchema = new mongoose.Schema({
 
 // Analytics/Logs Schema
 const analyticsSchema = new mongoose.Schema({
-  eventType: { 
-    type: String, 
+  eventType: {
+    type: String,
     enum: ['page_view', 'section_view', 'link_click', 'error', 'api_call'],
-    required: true 
+    required: true
   },
   page: { type: String },
   userAgent: { type: String },
