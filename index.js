@@ -26,7 +26,11 @@ fastify.register(require('@fastify/formbody'));
 fastify.register(require('@fastify/cookie'));
 fastify.register(require('@fastify/session'), {
   secret: process.env.SESSION_SECRET || 'your-super-secret-key-change-in-production',
-  cookie: { secure: false } // Set to true in production with HTTPS
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // true in production with HTTPS
+    httpOnly: true,
+    sameSite: 'lax'
+  }
 });
 
 // MongoDB connection
