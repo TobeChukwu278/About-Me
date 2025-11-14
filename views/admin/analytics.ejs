@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= pageTitle %>
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold text-violet-400">⚡ Admin - Analytics</h1>
+                <a href="/admin/dashboard" class="text-sm text-gray-400 hover:text-cyan-400">Dashboard</a>
+            </div>
+            <a href="/admin/logout" class="text-sm text-red-400">Logout</a>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-6">
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 overflow-x-auto">
+            <table class="min-w-full text-left">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 text-sm text-gray-400">Time</th>
+                        <th class="px-4 py-2 text-sm text-gray-400">Type</th>
+                        <th class="px-4 py-2 text-sm text-gray-400">Page</th>
+                        <th class="px-4 py-2 text-sm text-gray-400">IP</th>
+                        <th class="px-4 py-2 text-sm text-gray-400">UA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (analytics && analytics.length> 0) { %>
+                        <% analytics.forEach(a=> { %>
+                            <tr class="border-t border-gray-700">
+                                <td class="px-4 py-2 text-xs text-gray-400">
+                                    <%= new Date(a.timestamp).toLocaleString() %>
+                                </td>
+                                <td
+                                    class="px-4 py-2 text-sm <%= a.eventType === 'error' ? 'text-red-400' : 'text-cyan-400' %>">
+                                    <%= a.eventType %>
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-300">
+                                    <%= a.page || '—' %>
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-400">
+                                    <%= a.ipAddress || '—' %>
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-400">
+                                    <%= a.userAgent ? (a.userAgent.length> 60 ? a.userAgent.slice(0,60)+'...' :
+                                        a.userAgent) : '—' %>
+                                </td>
+                            </tr>
+                            <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-6 text-center text-gray-400">No analytics found.
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-4 flex items-center justify-between">
+            <div class="text-sm text-gray-400">Page <%= currentPage %> of <%= totalPages %>
+            </div>
+            <div class="flex gap-2">
+                <% for (let p=1; p<=totalPages; p++) { %>
+                    <a href="/admin/analytics?page=<%= p %>"
+                        class="px-3 py-1 text-sm <%= p===currentPage ? 'bg-cyan-500/20 text-cyan-300' : 'text-gray-400' %> rounded">
+                        <%= p %>
+                    </a>
+                    <% } %>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

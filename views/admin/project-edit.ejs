@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= pageTitle %>
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold text-violet-400">⚡ Admin - Edit Project</h1>
+                <a href="/admin/projects" class="text-sm text-gray-400 hover:text-cyan-400">Back to Projects</a>
+            </div>
+            <a href="/admin/logout" class="text-sm text-red-400">Logout</a>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-6">
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-cyan-400 mb-4">Edit Project - <%= project.name %>
+            </h2>
+            <form method="POST" action="/admin/projects/edit/<%= project._id %>" class="space-y-4">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">Name</label>
+                    <input type="text" name="name" value="<%= project.name %>" required
+                        class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">Short Description</label>
+                    <input type="text" name="description" value="<%= project.description %>" required
+                        class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">Long Description</label>
+                    <textarea name="longDescription"
+                        class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200"><%= project.longDescription || '' %></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">Tags (comma separated)</label>
+                    <input name="tags" value="<%= project.tags ? project.tags.join(', ') : '' %>"
+                        class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">GitHub URL</label>
+                    <input name="githubUrl" value="<%= project.githubUrl || '' %>"
+                        class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">Live URL</label>
+                    <input name="liveUrl" value="<%= project.liveUrl || '' %>"
+                        class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">Live Demo (embed URL)</label>
+                    <input name="liveDemo" value="<%= project.liveDemo || '' %>"
+                        class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                </div>
+                <div class="flex gap-2 items-center">
+                    <input type="number" name="order" value="<%= project.order || 0 %>"
+                        class="w-24 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                    <label class="text-sm text-gray-400"><input type="checkbox" name="featured" <%=project.featured
+                            ? 'checked' : '' %> /> Featured</label>
+                </div>
+                <div>
+                    <button
+                        class="px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded text-emerald-300">Save
+                        Changes</button>
+                    <a href="/admin/projects" class="ml-3 text-sm text-gray-400">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+
+</html>

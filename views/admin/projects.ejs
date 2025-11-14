@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= pageTitle %>
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold text-violet-400">⚡ Admin - Projects</h1>
+                <a href="/admin/dashboard" class="text-sm text-gray-400 hover:text-cyan-400">Dashboard</a>
+            </div>
+            <a href="/admin/logout" class="text-sm text-red-400">Logout</a>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-4">
+                <!-- Filter form -->
+                <form method="GET" action="/admin/projects" class="flex gap-2 mb-4">
+                    <input type="text" name="q" placeholder="Search..."
+                        value="<%= filters && filters.q ? filters.q : '' %>"
+                        class="px-3 py-2 bg-gray-800 border border-gray-700 rounded text-gray-200" />
+                    <select name="tag" class="px-3 py-2 bg-gray-800 border border-gray-700 rounded text-gray-200">
+                        <option value="">All tags</option>
+                        <% if (tags && tags.length>0) { tags.forEach(t=> { %>
+                            <option value="<%= t %>" <%=filters && filters.tag===t ? 'selected' : '' %>><%= t %>
+                            </option>
+                            <% }) } %>
+                    </select>
+                    <label class="inline-flex items-center gap-2 text-sm text-gray-300">
+                        <input type="checkbox" name="featured" value="1" <%=filters && filters.featured ? 'checked' : ''
+                            %> /> Featured
+                    </label>
+                    <button
+                        class="px-3 py-2 bg-cyan-500/20 border border-cyan-500/30 rounded text-cyan-300">Filter</button>
+                </form>
+                <% if (projects && projects.length>0) { %>
+                    <% projects.forEach(project=> { %>
+                        <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 flex items-start justify-between">
+                            <div>
+                                <h3 class="font-semibold text-gray-200">
+                                    <%= project.name %>
+                                </h3>
+                                <p class="text-sm text-gray-400">
+                                    <%= project.description %>
+                                </p>
+                                <div class="flex gap-2 mt-2">
+                                    <% if (project.tags) { project.tags.forEach(tag=> { %>
+                                        <span
+                                            class="px-2 py-0.5 bg-cyan-500/10 border border-cyan-500/30 rounded text-xs text-cyan-400">
+                                            <%= tag %>
+                                        </span>
+                                        <% }) } %>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <a href="/admin/projects/edit/<%= project._id %>"
+                                    class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded text-emerald-400 text-xs">Edit</a>
+                                <form method="POST" action="/admin/projects/delete/<%= project._id %>"
+                                    onsubmit="return confirm('Delete this project?')">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                                    <button type="submit"
+                                        class="px-3 py-1 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-xs">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                        <% }) %>
+                            <% } else { %>
+                                <p class="text-gray-400">No projects found.</p>
+                                <% } %>
+            </div>
+
+            <aside>
+                <div class="bg-gray-800 border border-gray-700 rounded-lg p-4">
+                    <h3 class="text-cyan-400 font-semibold mb-3">Add Project</h3>
+                    <form method="POST" action="/admin/projects/add" class="space-y-3">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                        <div>
+                            <input name="name" placeholder="Name" required
+                                class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                        </div>
+                        <div>
+                            <textarea name="description" placeholder="Short description" required
+                                class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200"></textarea>
+                        </div>
+                        <div>
+                            <input name="longDescription" placeholder="Long description (optional)"
+                                class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                        </div>
+                        <div>
+                            <input name="tags" placeholder="tags, comma, separated"
+                                class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                        </div>
+                        <div>
+                            <input name="githubUrl" placeholder="GitHub URL"
+                                class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                        </div>
+                        <div>
+                            <input name="liveUrl" placeholder="Live URL"
+                                class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                        </div>
+                        <div>
+                            <input name="liveDemo" placeholder="Live demo (embed URL)"
+                                class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <input type="number" name="order" placeholder="order"
+                                class="w-24 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                            <label class="text-sm text-gray-400"><input type="checkbox" name="featured" />
+                                Featured</label>
+                        </div>
+                        <div>
+                            <button
+                                class="px-4 py-2 bg-cyan-500/20 border border-cyan-500/40 rounded text-cyan-300">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+        </div>
+    </main>
+</body>
+
+</html>

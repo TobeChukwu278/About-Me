@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= pageTitle %>
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Helvetica Neue', monospace;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold text-cyan-400">⚡ Admin - Hero</h1>
+                <a href="/admin/dashboard" class="text-sm text-gray-400 hover:text-cyan-400">Dashboard</a>
+            </div>
+            <a href="/admin/logout" class="text-sm text-red-400">Logout</a>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-6">
+        <% if (success) { %>
+            <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-3 rounded mb-4">
+                <%= success %>
+            </div>
+            <% } %>
+                <% if (error) { %>
+                    <div class="bg-red-500/10 border border-red-500/30 text-red-300 p-3 rounded mb-4">
+                        <%= error %>
+                    </div>
+                    <% } %>
+
+                        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+                            <h2 class="text-xl font-semibold text-cyan-400 mb-4">Edit Hero Section</h2>
+                            <form method="POST" action="/admin/hero" class="space-y-4">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                                <div>
+                                    <label class="block text-sm text-gray-300 mb-1">Name</label>
+                                    <input type="text" name="name" value="<%= hero.name || '' %>" required
+                                        class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-300 mb-1">Title</label>
+                                    <input type="text" name="title" value="<%= hero.title || '' %>" required
+                                        class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-300 mb-1">Tagline</label>
+                                    <input type="text" name="tagline" value="<%= hero.tagline || '' %>"
+                                        class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-300 mb-1">Tech Stack (comma separated)</label>
+                                    <input type="text" name="techStack"
+                                        value="<%= hero.techStack ? hero.techStack.join(', ') : '' %>"
+                                        class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                                </div>
+                                <div>
+                                    <button type="submit"
+                                        class="px-4 py-2 bg-cyan-500/20 border border-cyan-500/40 rounded text-cyan-300 hover:bg-cyan-500/30">Save</button>
+                                    <a href="/admin/dashboard" class="ml-3 text-sm text-gray-400">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+    </main>
+</body>
+
+</html>

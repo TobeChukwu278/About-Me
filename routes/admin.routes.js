@@ -1,13 +1,14 @@
 const Admin = require('../models/Admin');
-const { 
-  Hero, 
-  TechStack, 
-  Project, 
-  Experience, 
-  About, 
+const {
+  Hero,
+  TechStack,
+  Project,
+  Experience,
+  About,
   Contact,
-  Analytics 
+  Analytics
 } = require('../models/Portfolio');
+const crypto = require('crypto');
 
 // Middleware to check authentication
 async function checkAuth(request, reply) {
@@ -16,14 +17,34 @@ async function checkAuth(request, reply) {
   }
 }
 
+// Ensure a CSRF token exists on the session
+function ensureCsrf(request) {
+  if (!request.session.csrfToken) {
+    request.session.csrfToken = crypto.randomBytes(24).toString('hex');
+  }
+  return request.session.csrfToken;
+}
+
+// Verify CSRF token from form submissions
+function verifyCsrf(request, reply) {
+  const token = request.body && request.body._csrf;
+  if (!token || token !== request.session.csrfToken) {
+    reply.code(403);
+    return reply.view('admin/error', { error: 'Invalid CSRF token' });
+  }
+  return true;
+}
+
 async function adminRoutes(fastify, options) {
-  
+
   // Admin login page
   fastify.get('/login', async (request, reply) => {
     if (request.session.adminId) {
       return reply.redirect('/admin/dashboard');
     }
-    return reply.view('admin/login', { error: null, pageTitle: 'Admin Login' });
+    // ensure csrf token (useful if you later add login CSRF)
+    ensureCsrf(request);
+    return reply.view('admin/login', { error: null, pageTitle: 'Admin Login', csrfToken: request.session.csrfToken });
   });
 
   // Handle login
@@ -32,9 +53,9 @@ async function adminRoutes(fastify, options) {
       const { username, password } = request.body;
 
       const admin = await Admin.findOne({ username, isActive: true });
-      
+
       if (!admin || !(await admin.comparePassword(password))) {
-        return reply.view('admin/login', { 
+        return reply.view('admin/login', {
           error: 'Invalid credentials',
           pageTitle: 'Admin Login'
         });
@@ -51,7 +72,7 @@ async function adminRoutes(fastify, options) {
       return reply.redirect('/admin/dashboard');
     } catch (error) {
       fastify.log.error('Login error:', error);
-      return reply.view('admin/login', { 
+      return reply.view('admin/login', {
         error: 'An error occurred. Please try again.',
         pageTitle: 'Admin Login'
       });
@@ -96,12 +117,13 @@ async function adminRoutes(fastify, options) {
         },
         recentAnalytics,
         username: request.session.username,
-        pageTitle: 'Admin Dashboard'
+        pageTitle: 'Admin Dashboard',
+        csrfToken: ensureCsrf(request)
       });
     } catch (error) {
       fastify.log.error('Dashboard error:', error);
-      return reply.code(500).view('admin/error', { 
-        error: 'Failed to load dashboard' 
+      return reply.code(500).view('admin/error', {
+        error: 'Failed to load dashboard'
       });
     }
   });
@@ -110,11 +132,12 @@ async function adminRoutes(fastify, options) {
   fastify.get('/hero', { preHandler: checkAuth }, async (request, reply) => {
     try {
       const hero = await Hero.findOne({ isActive: true });
-      return reply.view('admin/hero', { 
+      return reply.view('admin/hero', {
         hero: hero || {},
         success: null,
         error: null,
-        pageTitle: 'Manage Hero Section'
+        pageTitle: 'Manage Hero Section',
+        csrfToken: ensureCsrf(request)
       });
     } catch (error) {
       fastify.log.error('Hero load error:', error);
@@ -124,9 +147,12 @@ async function adminRoutes(fastify, options) {
 
   fastify.post('/hero', { preHandler: checkAuth }, async (request, reply) => {
     try {
+      // CSRF check
+      const csrfOk = verifyCsrf(request, reply);
+      if (!csrfOk) return;
+
       const { name, title, tagline, techStack } = request.body;
-      
-      const techStackArray = techStack.split(',').map(t => t.trim());
+      const techStackArray = techStack ? techStack.split(',').map(t => t.trim()) : [];
 
       await Hero.findOneAndUpdate(
         { isActive: true },
@@ -135,20 +161,22 @@ async function adminRoutes(fastify, options) {
       );
 
       const hero = await Hero.findOne({ isActive: true });
-      return reply.view('admin/hero', { 
+      return reply.view('admin/hero', {
         hero,
         success: 'Hero section updated successfully!',
         error: null,
-        pageTitle: 'Manage Hero Section'
+        pageTitle: 'Manage Hero Section',
+        csrfToken: ensureCsrf(request)
       });
     } catch (error) {
       fastify.log.error('Hero update error:', error);
       const hero = await Hero.findOne({ isActive: true });
-      return reply.view('admin/hero', { 
+      return reply.view('admin/hero', {
         hero: hero || {},
         success: null,
         error: 'Failed to update hero section',
-        pageTitle: 'Manage Hero Section'
+        pageTitle: 'Manage Hero Section',
+        csrfToken: ensureCsrf(request)
       });
     }
   });
@@ -157,11 +185,12 @@ async function adminRoutes(fastify, options) {
   fastify.get('/tech-stack', { preHandler: checkAuth }, async (request, reply) => {
     try {
       const techStack = await TechStack.find().sort({ order: 1 });
-      return reply.view('admin/tech-stack', { 
+      return reply.view('admin/tech-stack', {
         techStack,
         success: null,
         error: null,
-        pageTitle: 'Manage Tech Stack'
+        pageTitle: 'Manage Tech Stack',
+        csrfToken: ensureCsrf(request)
       });
     } catch (error) {
       fastify.log.error('Tech stack load error:', error);
@@ -171,10 +200,17 @@ async function adminRoutes(fastify, options) {
 
   fastify.post('/tech-stack/add', { preHandler: checkAuth }, async (request, reply) => {
     try {
+      // CSRF
+      const csrfOk = verifyCsrf(request, reply);
+      if (!csrfOk) return;
+
       const { name, icon, description, order } = request.body;
-      
+      // Basic validation
+      if (!name) {
+        return reply.redirect('/admin/tech-stack?error=validation');
+      }
+
       await TechStack.create({ name, icon, description, order: parseInt(order) || 0 });
-      
       return reply.redirect('/admin/tech-stack?success=added');
     } catch (error) {
       fastify.log.error('Tech stack add error:', error);
@@ -182,25 +218,39 @@ async function adminRoutes(fastify, options) {
     }
   });
 
-  fastify.post('/tech-stack/delete/:id', { preHandler: checkAuth }, async (request, reply) => {
-    try {
-      await TechStack.findByIdAndDelete(request.params.id);
-      return reply.redirect('/admin/tech-stack?success=deleted');
-    } catch (error) {
-      fastify.log.error('Tech stack delete error:', error);
-      return reply.redirect('/admin/tech-stack?error=failed');
-    }
-  });
-
   // Projects Management
   fastify.get('/projects', { preHandler: checkAuth }, async (request, reply) => {
     try {
-      const projects = await Project.find().sort({ order: 1 });
-      return reply.view('admin/projects', { 
+      // Filtering and search
+      const q = request.query.q ? String(request.query.q).trim() : null;
+      const tag = request.query.tag ? String(request.query.tag).trim() : null;
+      const featured = typeof request.query.featured !== 'undefined' ? request.query.featured === '1' : null;
+
+      const query = {};
+      if (q) {
+        query.$or = [
+          { name: { $regex: q, $options: 'i' } },
+          { description: { $regex: q, $options: 'i' } }
+        ];
+      }
+      if (tag) {
+        query.tags = tag;
+      }
+      if (featured !== null) {
+        query.featured = featured;
+      }
+
+      const projects = await Project.find(query).sort({ order: 1 }).lean();
+      const tags = await Project.distinct('tags');
+
+      return reply.view('admin/projects', {
         projects,
+        tags,
         success: null,
         error: null,
-        pageTitle: 'Manage Projects'
+        pageTitle: 'Manage Projects',
+        csrfToken: ensureCsrf(request),
+        filters: { q, tag, featured }
       });
     } catch (error) {
       fastify.log.error('Projects load error:', error);
@@ -210,20 +260,31 @@ async function adminRoutes(fastify, options) {
 
   fastify.post('/projects/add', { preHandler: checkAuth }, async (request, reply) => {
     try {
-      const { name, description, tags, link, githubUrl, order, featured } = request.body;
-      
-      const tagsArray = tags.split(',').map(t => t.trim());
+      // CSRF
+      const csrfOk = verifyCsrf(request, reply);
+      if (!csrfOk) return;
 
-      await Project.create({ 
-        name, 
-        description, 
-        tags: tagsArray, 
+      const { name, description, longDescription, tags, link, githubUrl, liveUrl, liveDemo, order, featured } = request.body;
+      // Basic validation
+      if (!name || !description) {
+        return reply.redirect('/admin/projects?error=validation');
+      }
+
+      const tagsArray = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+      await Project.create({
+        name,
+        description,
+        longDescription,
+        tags: tagsArray,
         link,
         githubUrl,
+        liveUrl,
+        liveDemo,
         order: parseInt(order) || 0,
         featured: featured === 'on'
       });
-      
+
       return reply.redirect('/admin/projects?success=added');
     } catch (error) {
       fastify.log.error('Project add error:', error);
@@ -233,10 +294,55 @@ async function adminRoutes(fastify, options) {
 
   fastify.post('/projects/delete/:id', { preHandler: checkAuth }, async (request, reply) => {
     try {
+      // CSRF
+      const csrfOk = verifyCsrf(request, reply);
+      if (!csrfOk) return;
+
       await Project.findByIdAndDelete(request.params.id);
       return reply.redirect('/admin/projects?success=deleted');
     } catch (error) {
       fastify.log.error('Project delete error:', error);
+      return reply.redirect('/admin/projects?error=failed');
+    }
+  });
+
+  // Project edit routes
+  fastify.get('/projects/edit/:id', { preHandler: checkAuth }, async (request, reply) => {
+    try {
+      const project = await Project.findById(request.params.id).lean();
+      if (!project) return reply.code(404).view('admin/error', { error: 'Project not found' });
+      return reply.view('admin/project-edit', { project, pageTitle: `Edit ${project.name}`, csrfToken: ensureCsrf(request) });
+    } catch (error) {
+      fastify.log.error('Project edit load error:', error);
+      return reply.code(500).view('admin/error', { error: 'Failed to load project for editing' });
+    }
+  });
+
+  fastify.post('/projects/edit/:id', { preHandler: checkAuth }, async (request, reply) => {
+    try {
+      // CSRF
+      const csrfOk = verifyCsrf(request, reply);
+      if (!csrfOk) return;
+
+      const { name, description, longDescription, tags, link, githubUrl, liveUrl, liveDemo, order, featured } = request.body;
+      const tagsArray = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+      await Project.findByIdAndUpdate(request.params.id, {
+        name,
+        description,
+        longDescription,
+        tags: tagsArray,
+        link,
+        githubUrl,
+        liveUrl,
+        liveDemo,
+        order: parseInt(order) || 0,
+        featured: featured === 'on'
+      });
+
+      return reply.redirect('/admin/projects?success=updated');
+    } catch (error) {
+      fastify.log.error('Project update error:', error);
       return reply.redirect('/admin/projects?error=failed');
     }
   });
@@ -269,6 +375,76 @@ async function adminRoutes(fastify, options) {
 
   // Similar routes for Experience, About, Contact...
   // (Follow same pattern as above)
+  // Experience Management
+  fastify.get('/experience', { preHandler: checkAuth }, async (request, reply) => {
+    try {
+      const experience = await Experience.find().sort({ order: 1 }).lean();
+      return reply.view('admin/experience', {
+        experience,
+        pageTitle: 'Manage Experience',
+        csrfToken: ensureCsrf(request)
+      });
+    } catch (error) {
+      fastify.log.error('Experience load error:', error);
+      return reply.code(500).view('admin/error', { error: 'Failed to load experience' });
+    }
+  });
+
+  fastify.post('/experience/add', { preHandler: checkAuth }, async (request, reply) => {
+    try {
+      // CSRF
+      const csrfOk = verifyCsrf(request, reply);
+      if (!csrfOk) return;
+
+      const { role, company, period, description, order } = request.body;
+      if (!role || !company) return reply.redirect('/admin/experience?error=validation');
+      await Experience.create({ role, company, period, description, order: parseInt(order) || 0 });
+      return reply.redirect('/admin/experience?success=added');
+    } catch (error) {
+      fastify.log.error('Experience add error:', error);
+      return reply.redirect('/admin/experience?error=failed');
+    }
+  });
+
+  fastify.post('/experience/delete/:id', { preHandler: checkAuth }, async (request, reply) => {
+    try {
+      // CSRF
+      const csrfOk = verifyCsrf(request, reply);
+      if (!csrfOk) return;
+
+      await Experience.findByIdAndDelete(request.params.id);
+      return reply.redirect('/admin/experience?success=deleted');
+    } catch (error) {
+      fastify.log.error('Experience delete error:', error);
+      return reply.redirect('/admin/experience?error=failed');
+    }
+  });
+
+  // Experience edit
+  fastify.get('/experience/edit/:id', { preHandler: checkAuth }, async (request, reply) => {
+    try {
+      const item = await Experience.findById(request.params.id).lean();
+      if (!item) return reply.code(404).view('admin/error', { error: 'Experience not found' });
+      return reply.view('admin/experience-edit', { experience: item, pageTitle: `Edit ${item.role}`, csrfToken: ensureCsrf(request) });
+    } catch (error) {
+      fastify.log.error('Experience edit load error:', error);
+      return reply.code(500).view('admin/error', { error: 'Failed to load experience for editing' });
+    }
+  });
+
+  fastify.post('/experience/edit/:id', { preHandler: checkAuth }, async (request, reply) => {
+    try {
+      const csrfOk = verifyCsrf(request, reply);
+      if (!csrfOk) return;
+
+      const { role, company, period, description, order } = request.body;
+      await Experience.findByIdAndUpdate(request.params.id, { role, company, period, description, order: parseInt(order) || 0 });
+      return reply.redirect('/admin/experience?success=updated');
+    } catch (error) {
+      fastify.log.error('Experience update error:', error);
+      return reply.redirect('/admin/experience?error=failed');
+    }
+  });
 }
 
 module.exports = adminRoutes;

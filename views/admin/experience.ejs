@@ -19,7 +19,7 @@
     <nav class="bg-gray-800 border-b border-gray-700">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <h1 class="text-lg font-bold text-emerald-400">⚡ Admin - Tech Stack</h1>
+                <h1 class="text-lg font-bold text-orange-400">⚡ Admin - Experience</h1>
                 <a href="/admin/dashboard" class="text-sm text-gray-400 hover:text-cyan-400">Dashboard</a>
             </div>
             <a href="/admin/logout" class="text-sm text-red-400">Logout</a>
@@ -29,44 +29,54 @@
     <main class="max-w-7xl mx-auto p-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 space-y-4">
-                <% if (techStack && techStack.length>0) { %>
-                    <% techStack.forEach(item=> { %>
-                        <div
-                            class="bg-gray-800 border border-gray-700 rounded-lg p-4 flex items-center justify-between">
+                <% if (experience && experience.length>0) { %>
+                    <% experience.forEach(item=> { %>
+                        <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 flex items-start justify-between">
                             <div>
                                 <div class="font-semibold text-gray-200">
-                                    <%= item.name %> <span class="text-sm text-gray-400">
-                                            <%= item.icon %>
+                                    <%= item.role %> — <span class="text-sm text-gray-400">
+                                            <%= item.company %>
                                         </span>
                                 </div>
                                 <div class="text-sm text-gray-400">
+                                    <%= item.period %>
+                                </div>
+                                <div class="text-sm text-gray-400 mt-2">
                                     <%= item.description %>
                                 </div>
                             </div>
-                            <form method="POST" action="/admin/tech-stack/delete/<%= item._id %>"
-                                onsubmit="return confirm('Delete this tech?')">
-                                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                                <button
-                                    class="px-3 py-1 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-xs">Delete</button>
-                            </form>
+                            <div class="flex flex-col gap-2">
+                                <a href="/admin/experience/edit/<%= item._id %>"
+                                    class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded text-emerald-400 text-xs">Edit</a>
+                                <form method="POST" action="/admin/experience/delete/<%= item._id %>"
+                                    onsubmit="return confirm('Delete this experience?')">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                                    <button
+                                        class="px-3 py-1 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-xs">Delete</button>
+                                </form>
+                            </div>
                         </div>
                         <% }) %>
                             <% } else { %>
-                                <p class="text-gray-400">No tech stack items found.</p>
+                                <p class="text-gray-400">No experience entries found.</p>
                                 <% } %>
             </div>
 
             <aside>
                 <div class="bg-gray-800 border border-gray-700 rounded-lg p-4">
-                    <h3 class="text-emerald-400 font-semibold mb-3">Add Tech</h3>
-                    <form method="POST" action="/admin/tech-stack/add" class="space-y-3">
+                    <h3 class="text-orange-400 font-semibold mb-3">Add Experience</h3>
+                    <form method="POST" action="/admin/experience/add" class="space-y-3">
                         <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                         <div>
-                            <input name="name" placeholder="Name" required
+                            <input name="role" placeholder="Role" required
                                 class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
                         </div>
                         <div>
-                            <input name="icon" placeholder="Icon (text)"
+                            <input name="company" placeholder="Company" required
+                                class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
+                        </div>
+                        <div>
+                            <input name="period" placeholder="Period (e.g. 2020 - 2022)"
                                 class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-200" />
                         </div>
                         <div>
@@ -79,7 +89,7 @@
                         </div>
                         <div>
                             <button
-                                class="px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded text-emerald-300">Add</button>
+                                class="px-4 py-2 bg-amber-500/20 border border-amber-500/40 rounded text-amber-300">Add</button>
                         </div>
                     </form>
                 </div>
