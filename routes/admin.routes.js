@@ -69,7 +69,8 @@ async function adminRoutes(fastify, options) {
       request.session.adminId = admin._id.toString();
       request.session.username = admin.username;
 
-      return reply.redirect('/admin/dashboard');
+      // Redirect with a quick success flag so the dashboard can show a toast
+      return reply.redirect('/admin/dashboard?login=1');
     } catch (error) {
       fastify.log.error('Login error:', error);
       return reply.view('admin/login', {

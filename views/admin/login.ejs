@@ -35,7 +35,7 @@
         </div>
         <% } %>
 
-          <form method="POST" action="/admin/login" class="space-y-6">
+          <form id="admin-login-form" method="POST" action="/admin/login" class="space-y-6">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div>
               <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
@@ -51,9 +51,14 @@
                 placeholder="Enter password" />
             </div>
 
-            <button type="submit"
-              class="w-full px-6 py-3 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 border border-cyan-500/50 rounded-lg text-cyan-400 hover:bg-cyan-500/30 transition-all font-semibold">
-              Login
+            <button id="login-btn" type="submit"
+              class="w-full px-6 py-3 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 border border-cyan-500/50 rounded-lg text-cyan-400 hover:bg-cyan-500/30 transition-all font-semibold flex items-center justify-center gap-3">
+              <svg id="login-spinner" class="hidden animate-spin h-5 w-5 text-cyan-300"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+              <span id="login-btn-text">Login</span>
             </button>
           </form>
 
@@ -62,6 +67,28 @@
           </div>
     </div>
   </div>
+
+  <script>
+    (function () {
+      const form = document.getElementById('admin-login-form');
+      const btn = document.getElementById('login-btn');
+      const spinner = document.getElementById('login-spinner');
+      const btnText = document.getElementById('login-btn-text');
+
+      if (form && btn) {
+        form.addEventListener('submit', function (e) {
+          // show loading UI but let the browser submit the form normally (so redirects work)
+          try {
+            btn.setAttribute('disabled', 'true');
+            spinner.classList.remove('hidden');
+            btnText.textContent = 'Signing in...';
+          } catch (err) {
+            // ignore
+          }
+        });
+      }
+    })();
+  </script>
 
 </body>
 
