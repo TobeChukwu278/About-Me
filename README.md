@@ -1,7 +1,7 @@
 # 🚀 TobeChukwu Ejiofor - Developer Portfolio
 
 Welcome to my personal developer portfolio!
-This repository conatins projects that demonstrate my skills in **JavScript, React, Node.js, Express, Fastify, MongoDb**, and other moder web technologies.
+This repository conatins projects that demonstrate my skills in **JavScript, React, Node.js, Express, Fastify, MongoDb**, and other modern web technologies.
 
 The portfolio is designed to be **clean, fast, and responsive**, showcasing real-world examples of my abilitiy to bulidfunctional, user friendly web applications
 

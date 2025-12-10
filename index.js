@@ -19,6 +19,7 @@ fastify.register(require('@fastify/view'), {
 
 fastify.register(require('@fastify/static'), {
   root: path.join(__dirname, 'public'),
+  maxAge: '1d',
   prefix: '/public/'
 });
 
