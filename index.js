@@ -52,6 +52,11 @@ require('./models/Portfolio');
 require('./models/Admin');
 
 // Import routes
+fastify.get('/robots.txt', async (request, reply) => {
+  return reply
+    .type('text/plain')
+    .send('User-agent: *\nAllow: /\n');
+});
 fastify.register(require('./routes/portfolio.routes.js'), { prefix: '/' });
 fastify.register(require('./routes/admin.routes.js'), { prefix: '/admin' });
 fastify.register(require('./routes/api.routes.js'), { prefix: '/api' });
