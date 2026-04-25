@@ -50,13 +50,22 @@ async function fetchStats() {
 
     const data = await response.json();
 
-    const uptimeEl = document.getElementById('uptime');
-    const latencyEl = document.getElementById('latency');
-    const requestsEl = document.getElementById('requests');
+    const liveStats = document.getElementById('liveStats');
+    if (!liveStats) return;
 
-    if (uptimeEl) uptimeEl.textContent = data.uptime;
-    if (latencyEl) latencyEl.textContent = data.latency + 'ms';
-    if (requestsEl) requestsEl.textContent = data.requests;
+    // Replace skeletons with actual content
+    const stats = [
+      { id: 'uptime', label: 'API Uptime', value: data.uptime, color: 'text-emerald-400', border: 'border-emerald-500/30', bg: 'from-emerald-500/10' },
+      { id: 'latency', label: 'Avg Latency', value: data.latency + 'ms', color: 'text-cyan-400', border: 'border-cyan-500/30', bg: 'from-cyan-500/10' },
+      { id: 'requests', label: 'Requests Served', value: data.requests, color: 'text-violet-400', border: 'border-violet-500/30', bg: 'from-violet-500/10' }
+    ];
+
+    liveStats.innerHTML = stats.map(stat => `
+      <div class="bg-gradient-to-br ${stat.bg} to-transparent border ${stat.border} rounded-lg p-4 text-center">
+        <div class="text-2xl font-bold ${stat.color} mb-1" id="${stat.id}">${stat.value}</div>
+        <div class="text-xs text-gray-400">${stat.label}</div>
+      </div>
+    `).join('');
   } catch (error) {
     console.error('Error fetching stats:', error);
   }
