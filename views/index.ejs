@@ -168,26 +168,24 @@
     <div
       class="bento-card hover-glow md:col-span-2 lg:col-span-2 bg-gray-800/50 backdrop-blur-sm border border-violet-500/20 rounded-2xl p-6 transition-all">
       <h3 class="text-lg font-semibold mb-4 text-violet-400 flex items-center gap-2">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
         Live System Stats
       </h3>
-      <div class="grid grid-cols-3 gap-4">
-        <div
-          class="bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/30 rounded-lg p-4 text-center">
-          <div class="text-2xl font-bold text-emerald-400 mb-1" id="uptime">--</div>
-          <div class="text-xs text-gray-400">API Uptime</div>
+      <div class="grid grid-cols-3 gap-4" id="liveStats">
+        <!-- Loading skeletons -->
+        <div class="skeleton-shimmer bg-gray-800 border border-gray-700 rounded-lg p-4 text-center" aria-busy="true">
+          <div class="h-8 w-16 bg-gray-700 rounded animate-pulse mx-auto mb-2"></div>
+          <div class="h-3 w-12 bg-gray-700 rounded animate-pulse mx-auto"></div>
         </div>
-        <div
-          class="bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/30 rounded-lg p-4 text-center">
-          <div class="text-2xl font-bold text-cyan-400 mb-1" id="latency">--</div>
-          <div class="text-xs text-gray-400">Avg Latency</div>
+        <div class="skeleton-shimmer bg-gray-800 border border-gray-700 rounded-lg p-4 text-center" aria-busy="true">
+          <div class="h-8 w-16 bg-gray-700 rounded animate-pulse mx-auto mb-2"></div>
+          <div class="h-3 w-12 bg-gray-700 rounded animate-pulse mx-auto"></div>
         </div>
-        <div
-          class="bg-gradient-to-br from-violet-500/10 to-transparent border border-violet-500/30 rounded-lg p-4 text-center">
-          <div class="text-2xl font-bold text-violet-400 mb-1" id="requests">--</div>
-          <div class="text-xs text-gray-400">Requests Served</div>
+        <div class="skeleton-shimmer bg-gray-800 border border-gray-700 rounded-lg p-4 text-center" aria-busy="true">
+          <div class="h-8 w-16 bg-gray-700 rounded animate-pulse mx-auto mb-2"></div>
+          <div class="h-3 w-12 bg-gray-700 rounded animate-pulse mx-auto"></div>
         </div>
       </div>
     </div>
@@ -196,7 +194,7 @@
     <div
       class="bento-card hover-glow md:col-span-2 lg:col-span-2 md:row-span-2 bg-gray-800/50 backdrop-blur-sm border border-cyan-500/20 rounded-2xl p-6 transition-all">
       <h3 class="text-lg font-semibold mb-4 text-cyan-400 flex items-center gap-2">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
         </svg>
