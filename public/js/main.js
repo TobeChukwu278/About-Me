@@ -75,12 +75,56 @@ const chatSend = document.getElementById('chatSend');
 const chatMessages = document.getElementById('chatMessages');
 
 if (chatToggle && chatPanel && chatClose && chatInput && chatSend && chatMessages) {
-  chatToggle.addEventListener('click', () => {
-    chatPanel.classList.toggle('hidden');
+  function openChat() {
+    chatPanel.classList.remove('hidden');
+    chatToggle.setAttribute('aria-expanded', 'true');
+    chatInput.focus();
+  }
+
+  function closeChat() {
+    chatPanel.classList.add('hidden');
+    chatToggle.setAttribute('aria-expanded', 'false');
+    chatToggle.focus();
+  }
+
+  chatToggle.addEventListener('click', openChat);
+  chatToggle.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openChat();
+    }
   });
 
-  chatClose.addEventListener('click', () => {
-    chatPanel.classList.add('hidden');
+  chatClose.addEventListener('click', closeChat);
+  chatClose.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      closeChat();
+    }
+  });
+
+  // Focus trap for chat panel
+  chatPanel.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeChat();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      const focusableElements = chatPanel.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+      }
+    }
   });
 
   async function sendMessage() {

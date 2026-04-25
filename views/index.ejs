@@ -1,17 +1,20 @@
 <!-- System Status Indicator -->
 <div
-  class="fixed top-24 right-4 z-30 flex items-center gap-2 bg-gray-800/80 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-500/30">
-  <div class="status-indicator" id="statusIndicator"></div>
+  class="fixed top-24 right-4 z-30 flex items-center gap-2 bg-gray-800/80 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-500/30"
+  role="status"
+  aria-live="polite"
+  aria-label="Server status">
+  <div class="status-indicator" id="statusIndicator" aria-hidden="true"></div>
   <span class="text-xs text-emerald-400 font-semibold" id="statusText">CHECKING...</span>
 </div>
 
 <!-- CLI-Inspired Navbar -->
-<nav class="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-40">
+<nav class="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-40" role="navigation" aria-label="Main navigation">
   <div class="max-w-7xl mx-auto px-6 py-4">
     <div class="flex items-center justify-between">
       <div class="flex flex-col gap-1 sm:flex sm:items-center sm:gap-2">
         <div class="flex items-center gap-2">
-          <svg class="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
@@ -21,8 +24,11 @@
       </div>
       <div class="flex items-center gap-4">
         <button id="chatToggle"
-          class="flex items-center gap-2 px-3 py-1.5 bg-violet-500/10 border border-violet-500/30 rounded-md hover:bg-violet-500/20 transition-all">
-          <svg class="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          class="flex items-center gap-2 px-3 py-1.5 bg-violet-500/10 border border-violet-500/30 rounded-md hover:bg-violet-500/20 transition-all"
+          aria-expanded="false"
+          aria-controls="chatPanel"
+          aria-label="Open portfolio assistant chat">
+          <svg class="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
@@ -35,18 +41,24 @@
 
 <!-- AI Chat Panel -->
 <div id="chatPanel"
-  class="hidden fixed right-6 top-20 w-96 h-[500px] bg-gray-900 border border-cyan-500/30 rounded-lg shadow-2xl z-50 flex flex-col">
-  <div
-    class="bg-gradient-to-r from-cyan-500/20 to-violet-500/20 px-4 py-3 border-b border-gray-800 flex items-center justify-between">
-    <div class="flex items-center gap-2">
-      <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-      </svg>
-      <span class="text-sm font-semibold text-cyan-400">Portfolio Assistant</span>
-    </div>
-    <button id="chatClose" class="text-gray-400 hover:text-gray-200">✕</button>
+  class="hidden fixed right-6 top-20 w-96 h-[500px] bg-gray-900 border border-cyan-500/30 rounded-lg shadow-2xl z-50 flex flex-col"
+  role="dialog"
+  aria-labelledby="chatPanelTitle"
+  aria-modal="true"
+  hidden>
+<div
+  class="bg-gradient-to-r from-cyan-500/20 to-violet-500/20 px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+  <div class="flex items-center gap-2">
+    <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+    </svg>
+    <span id="chatPanelTitle" class="text-sm font-semibold text-cyan-400">Portfolio Assistant</span>
   </div>
+  <button id="chatClose" class="text-gray-400 hover:text-gray-200" aria-label="Close chat panel">
+    ✕
+  </button>
+</div>
 
   <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3">
     <div class="text-gray-500 text-sm">
@@ -72,7 +84,7 @@
 </div>
 
 <!-- Main Content -->
-<div class="max-w-7xl mx-auto px-6 py-12">
+<main id="main-content" class="max-w-7xl mx-auto px-6 py-12" tabindex="-1">
   <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-auto">
 
     <!-- Hero Section -->
@@ -296,9 +308,10 @@
 </div>
 
 <!-- Footer -->
-<footer class="border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm mt-12">
+<footer class="border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm mt-12" role="contentinfo">
   <div class="max-w-7xl mx-auto px-6 py-6 text-center text-sm text-gray-500">
-    Made with <span class="text-emerald-400">⚡ Fastify</span> & <span class="text-emerald-400">MongoDB</span> | © 20241
+    Made with <span class="text-emerald-400">⚡ Fastify</span> & <span class="text-emerald-400">MongoDB</span> | © 2024
     Tobe Ejiofor
   </div>
 </footer>
+</main>
