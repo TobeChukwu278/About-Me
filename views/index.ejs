@@ -41,7 +41,7 @@
 
 <!-- AI Chat Panel -->
 <div id="chatPanel"
-  class="hidden fixed right-6 top-20 w-96 h-[500px] bg-gray-900 border border-cyan-500/30 rounded-lg shadow-2xl z-50 flex flex-col"
+  class="hidden fixed right-4 top-20 w-[calc(100vw-2rem)] sm:w-96 h-[calc(100vh-8rem)] sm:h-[500px] max-w-md mx-auto sm:mx-0 bg-gray-900 border border-cyan-500/30 rounded-lg shadow-2xl z-50 flex flex-col"
   role="dialog"
   aria-labelledby="chatPanelTitle"
   aria-modal="true"
@@ -74,9 +74,11 @@
   <div class="border-t border-gray-800 p-3">
     <div class="flex gap-2">
       <input type="text" id="chatInput" placeholder="Ask about tech stack, projects..."
-        class="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-cyan-500/50" />
+        class="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-cyan-500/50"
+        aria-label="Ask about tech stack, projects" />
       <button id="chatSend"
-        class="px-4 py-2 bg-cyan-500/20 border border-cyan-500/30 rounded text-cyan-400 hover:bg-cyan-500/30 transition-all text-sm">
+        class="px-4 py-2 bg-cyan-500/20 border border-cyan-500/30 rounded text-cyan-400 hover:bg-cyan-500/30 transition-all text-sm"
+        aria-label="Send message">
         Send
       </button>
     </div>
