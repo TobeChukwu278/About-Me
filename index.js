@@ -1,5 +1,14 @@
 // Enable trustProxy so Fastify honors X-Forwarded-* headers (required when behind Render/Cloudflare)
-const fastify = require('fastify')({ logger: true, trustProxy: true });
+const fastify = require('fastify')({ 
+  logger: {
+    level: process.env.LOG_LEVEL || 'info',
+    transport: process.env.NODE_ENV !== 'production' ? {
+      target: 'pino-pretty',
+      options: { colorize: true, translateTime: 'HH:MM:ss', ignore: 'pid,hostname' }
+    } : undefined
+  },
+  trustProxy: true 
+});
 const path = require('path');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
